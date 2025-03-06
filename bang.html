@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>방제 퀴즈_한글 (By.YSY)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f0f8ff;
+            padding: 40px;
+            max-width: 700px;
+            margin: auto;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        /* Navigation Bar */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #4CAF50;
+            padding: 10px 20px;
+            border-radius: 10px;
+        }
+        
+        .navbar ul {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+        }
+
+        .navbar li {
+            margin-right: 20px;
+        }
+
+        .navbar a {
+            text-decoration: none;
+            color: white;
+            font-weight: 600;
+            transition: color 0.3s;
+        }
+
+        .navbar a:hover {
+            color: #e0f7fa;
+        }
+
+        h1 {
+            text-align: center;
+            color: #4CAF50;
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+        p {
+            text-align: center;
+            font-size: 1.2rem;
+            color: #666;
+            margin-bottom: 30px;
+        }
+        .quiz-container {
+            background: #fff;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        input {
+            padding: 12px;
+            font-size: 18px;
+            width: 80%;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            outline: none;
+        }
+        button {
+            padding: 12px 25px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 18px;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .result {
+            margin-top: 20px;
+            font-size: 20px;
+            color: #007bff;
+            font-weight: bold;
+        }
+        .result.correct {
+            color: #28a745;
+        }
+        .result.incorrect {
+            color: #dc3545;
+        }
+        @media (max-width: 768px) {
+            body {
+                padding: 20px;
+            }
+            h1 {
+                font-size: 2rem;
+            }
+            .navbar ul {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .navbar li {
+                margin-bottom: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="logo">
+            <a href="#">우석대 한약학과</a>
+        </div>
+        <ul>
+            <li><a href="본초분류 퀴즈 프로그램_한자.html">본초</a></li>
+            <li><a href="bang.html">방제</a></li>
+        </ul>
+    </nav>
+
+    <h1>방제분류 퀴즈</h1>
+    <p>정확한 분류를 입력해주세요. ex 마황탕 -> 해표제 (X) 신온해표제 (O)</p>
+
+    <div class="quiz-container">
+        <div id="herb-name"></div>
+        <input type="text" id="user-answer" placeholder="정답 입력">
+        <button onclick="checkAnswer()">확인</button>
+
+        <div class="result" id="result"></div>
+    </div>
+
+    <div>
+        <a href="bang_2.html"><button>방제명을 한자로</button></a>
+    </div>
+
+    <script>
+        const herbs = {
+            '신온해표제': ['마황탕','대청룡탕','계지탕','갈근탕','구미강활탕','가미향소산','소청룡탕'],
+            '신량해표제': ['상국음','은교산','마행감석탕','월비탕','시갈해기탕','승마갈근탕'],
+            '부정해표제': ['청상방풍탕','형개연교탕','인삼패독산','삼소음','마황부자세신탕'],
+            '한하제':['대승기탕','소승기탕','조위승기탕','대함흉탕'],
+            '온하제':['삼물비급환','대황부자탕','온백원'],
+            '윤하제':['마자인환','제천전'],
+            '축수제':['십조탕'],
+            '공보겸시제':['증액승기탕','온비탕'],
+            '화해소양제':['소시호탕'],
+            '조화간비제':['사역산','소요산','백출작약산','시호억간탕','시호청간탕','청간해울탕'],
+            '조화비위제':['반하사심탕'],
+            '청기분열제':['백호탕'],
+            '청열해독제':['황련해독탕','(삼황)사심탕','양격산'],
+            '청장부열제':['도적산','청심연자음','용담사간탕','청위산','옥녀전','작약탕','백두옹탕','황금탕'],
+            '청허열제':['당귀육황탕'],
+            '거서해표제': ['신가향유음'],
+            '거서익기제': ['청서익기탕'],
+            '온중거한제': ['이중환','오수유탕','소건중탕','대건중탕'],
+            '회양구역제': ['사역탕'],
+            '온경산한제': ['당귀사역탕','안중산'],
+            '해표공리제':['대시호탕','방풍통성산'],
+            '해표온리제': ['오적산'],
+            '보기제': ['사군자탕','삼령백출산','보중익기탕','생맥산'],
+            '보혈제': ['사물탕','당귀보혈탕','귀비탕','자감초탕'],
+            '기혈쌍보제': ['팔진탕','쌍화탕','당귀작약산'],
+            '보음제': ['육미지황환','자음강화탕','일관전','대보음환'],
+            '보양제': ['팔미지황환','녹용대보탕','연령고본단'],
+            '자양안신제': ['산조인탕','감맥대조탕'],
+            '량개제': ['우황청심환','안궁우황환'],
+            '온개제': ['소합향환'],
+            '고표지한제': ['모려산','옥병풍산'],
+            '삽정지유제': ['상표초산','축천환'],
+            '삽장고탈제': ['진인양장탕','사신환'],
+            '고붕지대제': ['완대탕','고충탕'],
+            '행기제': ['월국환','반하후박탕','난간전','후박온중탕'],
+            '강기제': ['소자강기탕','정천탕','선복대자탕','오약순기산','분심기음'],
+            '활혈거어제': ['도핵승기탕','혈부축어탕','계지복령환','당귀수산','보양환오탕','온경탕','생화탕','조경종옥탕','귀출파징탕'],
+            '지혈제': ['괴화산','황토탕','소계음자','교애탕'],
+            '소산외풍제': ['소풍산','대진교탕','소활락단','천궁다조산','견정산'],
+            '평식내풍제': ['진간식풍탕','천마구등음','지황음자'],
+            '자음윤조제': ['양음청폐탕','맥문동탕','경옥고','증액탕','생혈윤부음'],
+            '방향화습제':['평위산','곽향정기산','시평탕'],
+            '청열거습제': ['인진호탕','팔정산'],
+            '이수삼습제': ['오령산','위령탕','저령탕','방기황기탕'],
+            '온화수습제': ['실비산','영계출감탕','진무탕'],
+            '거풍승습제': ['강활승습탕','대강활탕','독활기생탕','대방풍탕','소풍활혈탕'],
+            '조습화담제': ['이진탕','금수육군전','온담탕'],
+            '청열화담제': ['소함흉탕','곤담환'],
+            '윤조화담제': ['패모과루산'],
+            '온화한담제': ['령감오미강신탕','삼자양친탕'],
+            '치풍화담제': ['반하백출천마탕','자음건비탕','청금강화탕'],
+            '소식도체제': ['보화환','건비환'],
+            '치외옹제':['선방활명음','배농산급탕'],
+            '치내옹제': ['대황목단피탕','의이부자패장산'],
+            // Other categories and herbs
+        };
+
+        let currentHerb = '';
+        let correctCategory = '';
+        let totalQuestions = 0;
+        let correctAnswers = 0;
+
+        function getRandomHerb() {
+            const categories = Object.keys(herbs);
+            const randomCategory = categories[Math.floor(Math.random() * categories.length)];
+            const herbList = herbs[randomCategory];
+            const randomHerb = herbList[Math.floor(Math.random() * herbList.length)];
+
+            currentHerb = randomHerb;
+            correctCategory = randomCategory;
+            document.getElementById('herb-name').innerHTML = `<strong>${currentHerb}</strong>`;
+        }
+
+        function checkAnswer() {
+            const userAnswer = document.getElementById('user-answer').value;
+            totalQuestions++;
+
+            const resultElem = document.getElementById('result');
+            if (userAnswer === correctCategory) {
+                correctAnswers++;
+                resultElem.className = 'result correct';
+                resultElem.innerHTML = `정답! <strong>${correctCategory}</strong>.`;
+            } else {
+                resultElem.className = 'result incorrect';
+                resultElem.innerHTML = `오답. <strong>${correctCategory}</strong>.`;
+            }
+
+            if (totalQuestions < 100) {
+                getRandomHerb();
+                document.getElementById('user-answer').value = '';
+            } else {
+                resultElem.innerHTML += `<br>Quiz completed! You got ${correctAnswers} out of 100 correct.`;
+                document.getElementById('herb-name').innerHTML = '';
+                document.getElementById('user-answer').style.display = 'none';
+                document.querySelector('button').style.display = 'none';
+            }
+        }
+
+        getRandomHerb();
+    </script>
+
+</body>
+</html>

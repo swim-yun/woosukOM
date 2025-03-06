@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>본초 퀴즈_한자 (By.YSY)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f0f8ff;
+            padding: 40px;
+            max-width: 700px;
+            margin: auto;
+            color: #333;
+            line-height: 1.6;
+        }
+        /* Navigation Bar */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #4CAF50;
+            padding: 10px 20px;
+            border-radius: 10px;
+        }
+        
+        .navbar ul {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+        }
+
+        .navbar li {
+            margin-right: 20px;
+        }
+
+        .navbar a {
+            text-decoration: none;
+            color: white;
+            font-weight: 600;
+            transition: color 0.3s;
+        }
+
+        .navbar a:hover {
+            color: #e0f7fa;
+        }
+
+        h1 {
+            text-align: center;
+            color: #4CAF50;
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+        p {
+            text-align: center;
+            font-size: 1.2rem;
+            color: #666;
+            margin-bottom: 30px;
+        }
+        .quiz-container {
+            background: #fff;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        input {
+            padding: 12px;
+            font-size: 18px;
+            width: 80%;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            outline: none;
+        }
+        button {
+            padding: 12px 25px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 18px;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .result {
+            margin-top: 20px;
+            font-size: 20px;
+            color: #007bff;
+            font-weight: bold;
+        }
+        .result.correct {
+            color: #28a745;
+        }
+        .result.incorrect {
+            color: #dc3545;
+        }
+        @media (max-width: 768px) {
+            body {
+                padding: 20px;
+            }
+            h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="logo">
+            <a href="#">우석대 한약학과</a>
+        </div>
+        <ul>
+            <li><a href="본초분류 퀴즈 프로그램_한자.html">본초</a></li>
+            <li><a href="bang.html">방제</a></li>
+        </ul>
+    </nav>
+
+    <h1>본초분류 퀴즈</h1>
+    <p>정확한 분류를 입력해주세요. ex 마황 -> 해표약 (X) 발산풍한약 (O)</p>
+
+    <div class="quiz-container">
+        <div id="herb-name"></div>
+        <input type="text" id="user-answer" placeholder="정답 입력">
+        <button onclick="checkAnswer()">확인</button>
+
+        <div class="result" id="result"></div>
+    </div>
+    <div>
+        <a href="본초분류 퀴즈 프로그램_한글.html"><button>약재명을 한글로</button></a>
+    </div>
+
+    <script>
+        const herbs = {
+            '발산풍한약': ['麻黃','桂枝','紫蘇葉','荊芥','羌活','白芷','防風','藁本','生薑','辛荑','細辛','香薷','蔥白','檉柳','蒼耳子'],
+            '발산풍열약': ['薄荷','菊花','葛根','柴胡','升麻','牛蒡子','桑葉', '蔓荊子', '淡豆豉', '蟬退', '浮萍', '木賊'],
+            '청열사화약': ['石膏', '知母', '栝樓根', '梔子', '蘆根', '竹葉', '淡竹葉', '夏枯草', '密蒙花', '靑葙子'],
+            '청열조습약':['黃芩','黃連','黃柏','龍膽草','苦蔘','白鮮皮','大豆黃卷'],
+            '청열량혈약':['地黃','玄蔘','牡丹皮','赤芍藥','紫草'],
+            '청열해독약':['金銀花','忍冬藤','連翹','浦公英','紫花地丁','大靑葉','板藍根', '靑黛', '牛黃', '馬齒莧', '白頭翁', '秦皮','敗醬草', '白花蛇舌草', '熊膽', '白蔽', '漏蘆', '山慈姑', '綠豆', '萎陵菜', '野菊花','蚤休','半邊蓮','土茯苓','魚腥草','射干','山豆根'],
+            '청허열약':['菁蒿','白薇','地骨皮','銀柴胡','胡黃蓮'],
+            '공하약':['大黃','芒硝','蘆薈'],
+            '윤하약':['火麻仁','郁李仁'],
+            '준하축수약':['甘遂','大戟','芫花','牽牛子','商陸','巴豆','續隨子'],
+            '거풍습지비통약':['獨活','威靈仙','防己','秦艽','海桐皮','草烏','蠶沙','馬錢子'],
+            '서근활락약':['木瓜','絡石藤','絲瓜絡','桑枝','白花蛇','豨薟','烏梢蛇','臭梧桐'],
+            '거풍습강근골약':['五加皮','桑寄生','槲寄生'],
+            '방향화습약':['蒼朮','厚朴', '藿香', '砂仁', '佩蘭','白荳蔲','草豆蔻','草果'],
+            '이수퇴종약':['茯苓','猪苓','澤瀉','薏苡仁','冬瓜皮','玉米鬚'],
+            '이뇨통림약': ['車前子','木通','滑石','通草','海金沙','石葦','萆薢','地膚子', '篇蓄', '瞿麥', '冬葵子', '燈心草', '三白草'],
+            '이습퇴황약': ['茵藤蒿','金錢草'],
+            '온리약': ['附子', '川烏', '乾薑', '肉桂', '吳茱萸', '蓽撥','蓽澄茄', '丁香', '高良薑', '茴香', '胡椒', '蜀椒'],
+            '이기약': ['陳皮','靑皮', '枳實', '枳殼','木香', '香附子', '烏藥', '土木香','沈香', '川楝子', '茘枝核', '薤白','檀香','枾蒂','玫瑰花','大腹皮','甘松香'],
+            '수렴지혈약': ['龍牙草','白芨','棕櫚皮','藕節'],
+            '량혈지혈약':['大薊','小薊','地楡','槐花','側柏葉','白茅根','羊蹄根'],
+            '화어지혈약': ['三七','蒲黃'],
+            '온경지혈약': ['艾葉','伏龍肝'],
+            '활혈거어약': ['川芎', '丹參', '乳香', '沒藥', '玄胡索','鬱金', '薑黃', '莪朮', '三棱','益母草', '桃仁', '紅花', '牛膝','虎杖根','五靈脂', '穿山甲', '蛾蟲', '水蛭','澤蘭','凌霄花', '自然銅','王不留行', '蘇木', '乾漆', '皂角刺', '血竭', '茺蔚子', '卷柏', '鷄血藤'],
+            '온화한담약': ['半夏', '天南星','白附子', '白芥子', '皂莢', '旋覆花', '白前'],
+            '청화열담약': ['前胡', '桔梗', '栝樓仁', '貝母', '天竺黃', '竹茹', '竹瀝','靑礞石','海藻','昆布','胖大海', '枇杷葉', '冬瓜子'],
+            '지해평천약': ['杏仁', '白果', '百部根', '紫菀', '款冬花','蘇子', '桑白皮', '葶藶子'],
+            '안신약': ['酸棗仁','遠志','朱沙','磁石','龍骨','琥珀','柏子仁','合歡皮','靈芝','首烏藤'],
+            '평간식풍약': ['羚羊角','釣鉤藤','天麻','白殭蠶','全蝎','蜈蚣','地龍','決明子'],
+            '평간잠양약': ['石決明','牡蠣','珍珠','代赭石','蒺藜子'],
+            '개규약': ['石菖蒲','麝香','龍腦','蘇合香','安息香','蟾酥','樟腦'],
+            '보기약': ['人蔘','白朮','山藥','黃芪','黨參','白扁豆','甘草','大棗','蜂蜜'],
+            '보양약': ['鹿茸', '鹿角', '鹿角膠', '鹿角霜','巴戟天', '肉蓰蓉','淫羊藿', '杜仲', '續斷','益智', '仙茅', '葫蘆巴', '補骨脂', '狗脊','骨碎補', '冬蟲夏草', '蛤蚧', '胡桃仁','紫河車','菟絲子','沙苑子','鎖陽','韮子','陽起石','海狗腎','海馬','蛇床子'],
+            '보혈약': ['當歸','熟地黃','白芍藥','何首烏','白首烏','阿膠','龍眼肉'],
+            '보음약': ['沙參', '玉竹', '黃精','麥門冬', '天門冬', '枸杞子','石斛', '百合', '桑椹子', '旱蓮草','女貞實','龜板', '鱉甲', '黑脂麻', '楮實子'],
+            '지한약': ['浮小麥','麻黃根','糯稻根'],
+            '지사약': ['訶子','肉豆蔻','赤石脂','烏梅','罌粟殼','禹餘糧','石榴皮','五倍子'],
+            '삽정축뇨지대약': ['五味子', '蓮子肉', '山茱萸', '芡仁', '金櫻子','桑螵峭', '覆盆子', '海螵蛸', '白礬'],
+            '소도약': ['山楂','神麯','穀芽','麥芽','萊服子','鷄內金'],
+            '구충약': ['使君子', '苦楝皮','檳榔子','雷丸', '鶴虱', '榧子', '蕪荑', '貫衆'],
+            '용토약': ['瓜蒂','常山','膽礬','藜蘆'],
+            '외용약':['硫黃','砒石','雄黃','輕粉','鉛丹','爐甘石','硼砂','斑猫','露蜂房','大風子']
+            // Other categories and herbs
+        };
+
+        let currentHerb = '';
+        let correctCategory = '';
+        let totalQuestions = 0;
+        let correctAnswers = 0;
+
+        function getRandomHerb() {
+            const categories = Object.keys(herbs);
+            const randomCategory = categories[Math.floor(Math.random() * categories.length)];
+            const herbList = herbs[randomCategory];
+            const randomHerb = herbList[Math.floor(Math.random() * herbList.length)];
+
+            currentHerb = randomHerb;
+            correctCategory = randomCategory;
+            document.getElementById('herb-name').innerHTML = `<strong>${currentHerb}</strong>`;
+        }
+
+        function checkAnswer() {
+            const userAnswer = document.getElementById('user-answer').value;
+            totalQuestions++;
+
+            const resultElem = document.getElementById('result');
+            if (userAnswer === correctCategory) {
+                correctAnswers++;
+                resultElem.className = 'result correct';
+                resultElem.innerHTML = `정답! <strong>${correctCategory}</strong>.`;
+            } else {
+                resultElem.className = 'result incorrect';
+                resultElem.innerHTML = `오답. <strong>${correctCategory}</strong>.`;
+            }
+
+            if (totalQuestions < 100) {
+                getRandomHerb();
+                document.getElementById('user-answer').value = '';
+            } else {
+                resultElem.innerHTML += `<br>Quiz completed! You got ${correctAnswers} out of 100 correct.`;
+                document.getElementById('herb-name').innerHTML = '';
+                document.getElementById('user-answer').style.display = 'none';
+                document.querySelector('button').style.display = 'none';
+            }
+        }
+
+        getRandomHerb();
+    </script>
+
+</body>
+</html>

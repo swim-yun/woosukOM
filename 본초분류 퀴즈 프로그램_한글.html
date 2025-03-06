@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>본초 퀴즈_한글 (By.YSY)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f0f8ff;
+            padding: 40px;
+            max-width: 700px;
+            margin: auto;
+            color: #333;
+            line-height: 1.6;
+        }
+        /* Navigation Bar */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #4CAF50;
+            padding: 10px 20px;
+            border-radius: 10px;
+        }
+        
+        .navbar ul {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+        }
+
+        .navbar li {
+            margin-right: 20px;
+        }
+
+        .navbar a {
+            text-decoration: none;
+            color: white;
+            font-weight: 600;
+            transition: color 0.3s;
+        }
+
+        .navbar a:hover {
+            color: #e0f7fa;
+        }
+
+        h1 {
+            text-align: center;
+            color: #4CAF50;
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+        p {
+            text-align: center;
+            font-size: 1.2rem;
+            color: #666;
+            margin-bottom: 30px;
+        }
+        .quiz-container {
+            background: #fff;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        input {
+            padding: 12px;
+            font-size: 18px;
+            width: 80%;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            outline: none;
+        }
+        button {
+            padding: 12px 25px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 18px;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .result {
+            margin-top: 20px;
+            font-size: 20px;
+            color: #007bff;
+            font-weight: bold;
+        }
+        .result.correct {
+            color: #28a745;
+        }
+        .result.incorrect {
+            color: #dc3545;
+        }
+        @media (max-width: 768px) {
+            body {
+                padding: 20px;
+            }
+            h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+        <!-- Navigation Bar -->
+        <nav class="navbar">
+            <div class="logo">
+                <a href="#">우석대 한약학과</a>
+            </div>
+            <ul>
+                <li><a href="본초분류 퀴즈 프로그램_한자.html">본초</a></li>
+                <li><a href="bang.html">방제</a></li>
+            </ul>
+        </nav>
+
+    <h1>본초분류 퀴즈</h1>
+    <p>정확한 분류를 입력해주세요. ex 마황 -> 해표약 (X) 발산풍한약 (O)</p>
+
+    <div class="quiz-container">
+        <div id="herb-name"></div>
+        <input type="text" id="user-answer" placeholder="정답 입력">
+        <button onclick="checkAnswer()">확인</button>
+
+        <div class="result" id="result"></div>
+    </div>
+    <div>
+        <a href="본초분류 퀴즈 프로그램_한자.html"><button>약재명을 한자로</button></a>
+    </div>
+
+    <script>
+        const herbs = {
+            '발산풍한약': ['마황', '계지', '자소엽', '형개', '강활', '백지', '방풍', '고본', '생강', '신이', '세신', '향유', '총백', '정류', '창이자'],
+            '발산풍열약': ['박하', '국화', '갈근', '시호', '승마', '우방자', '상엽', '만형자', '담두시', '선퇴', '부평', '목적'],
+            '청열사화약': ['석고', '지모', '괄루근', '치자', '노근', '죽엽', '담죽엽', '하고초', '밀몽화', '청상자'],
+            '청열조습약':['황금', '황련', '황백', '용담초', '고삼', '백선피', '대두황권'],
+            '청열량혈약':['지황','현삼','목단피','적작약','자초'],
+            '청열해독약':['금은화', '인동등', '연교', '포공영', '자화지정', '대청엽', '판람근', '청대', '우황', '마치현', '백두옹', '秦皮','패장초', '백화사설초', '웅담', '백렴', '누로', '산자고', '녹두', '위릉채', '야국화', '조휴', '반변련', '토복령', '어성초','사간', '산두근'],
+            '청허열약':['청호','백미','지골피','은시호','호황련'],
+            '공하약':['대황','망초','노회'],
+            '윤하약':['화마인','욱리인'],
+            '준하축수약':['감수','대극','원화','견우자','상륙','파두','속수자'],
+            '거풍습지비통약':['독활','위령선','방기','진교','해동피','초오','잠사','마전자'],
+            '서근활락약':['모과','낙석등','사과락','상지','백화사','희렴','초오사','취오동'],
+            '거풍습강근골약':['오가피','상기생','곡기생'],
+            '방향화습약':['창출', '후박', '곽향', '사인', '패란','백두구', '초두구', '초과'],
+            '이수퇴종약':['복령','저령','택사','의이인','동과피','옥미수'],
+            '이뇨통림약': ['차전자', '목통', '활석', '통초', '해금사', '석위','비해', '지부자', '편축', '구맥', '동규자', '등심초', '삼백초'],
+            '이습퇴황약': ['인진호','금전초'],
+            '온리약': ['부자', '천오두', '건강', '육계', '오수유', '필발','필징가', '정향', '고량강', '소회향', '호초', '촉초'],
+            '이기약': ['陳皮','청피', '지실', '지각','목향', '향부자', '오약', '토목향','침향', '천련자', '여지핵', '해백','단향', '시체', '매괴화', '대복피', '감송향'],
+            '수렴지혈약': ['선학초','백급','종려피','우절'],
+            '량혈지혈약':['대계','소계','지유','괴화','측백엽','백모근','양제근'],
+            '화어지혈약': ['삼칠','포황'],
+            '온경지혈약': ['애엽','복룡간'],
+            '활혈거어약': ['천궁', '단삼', '유향', '몰약', '현호색','울금', '강황', '아출', '삼릉','익모초', '도인', '홍화', '우슬','호장근','오령지', '천산갑', '자충', '수질','택란','능소화', '자연동','왕불류행', '소목', '건칠', '조각자', '혈갈', '충울자', '권백', '계혈등'],
+            '온화한담약': ['반하', '천남성','백부자', '백개자', '조협', '선복화', '백전'],
+            '청화열담약': ['전호', '길경', '괄루', '천패모', '절패모', '천축황', '죽여', '죽력','청몽석', '해조', '곤포','반대해', '비파엽', '동과자'],
+            '지해평천약': ['행인', '백과', '백부근', '자완', '관동화','소자', '상백피', '정력자'],
+            '안신약': ['산조인','원지','주사','자석','용골','호박','백자인','합환피','영지','야교등'],
+            '평간식풍약': ['영양각','조구등','천마','백강잠','전갈','오공','구인','결명자'],
+            '평간잠양약': ['석결명','모려','진주','대자석','백질려'],
+            '개규약': ['석창포','사향','빙편','소합향','안식향','섬수','장뇌'],
+            '보기약': ['인삼','백출','산약','황기','당삼','백편두','감초','대조','봉밀'],
+            '보양약': ['녹용', '녹각', '녹각교', '녹각상','파극천', '육종용', '음양곽', '두충', '속단','익지인', '선모', '호로파', '보골지', '구척','골쇄보', '동충하초', '합개', '호도인', '자하거','토사자', '사원질려', '쇄양', '구자', '양기석','해구신', '해마', '사상자'],
+            '보혈약': ['당귀','숙지황','백작약','하수오','백수오','아교','용안육'],
+            '보음약': ['사삼', '옥죽', '황정','맥문동', '천문동', '구기자','석곡', '백합', '상심자', '한련초','여정자','귀판', '별갑', '흑지마', '저실자'],
+            '지한약': ['부소맥','마황근','나도근'],
+            '지사약': ['가자','육두구','적석지','오매','앵속각','우여량','석류피','오배자'],
+            '삽정축뇨지대약': ['오미자', '연자육', '산수유', '검실', '금앵자','상표초', '복분자', '해표초', '백반'],
+            '소도약': ['산사','신곡','곡아','맥아','내복자','계내금'],
+            '구충약': ['사군자', '고련피','빈랑자', '뇌환', '학슬', '비자', '무이', '관중'],
+            '용토약': ['과체','상산','담반','여로'],
+            '외용약':['유황','비석','웅황','경분','연단','노감석','붕사','반묘','노봉방','대풍자']
+            // Other categories and herbs
+        };
+
+        let currentHerb = '';
+        let correctCategory = '';
+        let totalQuestions = 0;
+        let correctAnswers = 0;
+
+        function getRandomHerb() {
+            const categories = Object.keys(herbs);
+            const randomCategory = categories[Math.floor(Math.random() * categories.length)];
+            const herbList = herbs[randomCategory];
+            const randomHerb = herbList[Math.floor(Math.random() * herbList.length)];
+
+            currentHerb = randomHerb;
+            correctCategory = randomCategory;
+            document.getElementById('herb-name').innerHTML = `<strong>${currentHerb}</strong>`;
+        }
+
+        function checkAnswer() {
+            const userAnswer = document.getElementById('user-answer').value;
+            totalQuestions++;
+
+            const resultElem = document.getElementById('result');
+            if (userAnswer === correctCategory) {
+                correctAnswers++;
+                resultElem.className = 'result correct';
+                resultElem.innerHTML = `정답! <strong>${correctCategory}</strong>.`;
+            } else {
+                resultElem.className = 'result incorrect';
+                resultElem.innerHTML = `오답. <strong>${correctCategory}</strong>.`;
+            }
+
+            if (totalQuestions < 100) {
+                getRandomHerb();
+                document.getElementById('user-answer').value = '';
+            } else {
+                resultElem.innerHTML += `<br>Quiz completed! You got ${correctAnswers} out of 100 correct.`;
+                document.getElementById('herb-name').innerHTML = '';
+                document.getElementById('user-answer').style.display = 'none';
+                document.querySelector('button').style.display = 'none';
+            }
+        }
+
+        getRandomHerb();
+    </script>
+
+</body>
+</html>
